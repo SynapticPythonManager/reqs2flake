@@ -180,9 +180,18 @@ EOF
 
 gen_toml
 
-git init
-git add flake.nix uv.lock pyproject.toml requirements.bak.txt
-git commit -m "Add flake.nix uv.lock pyproject.toml requirements.bak.txt"
+# --- Git bootstrap for local flake ---
+cd "$TargetDir"
+
+# Only init if not already a git repo
+if [ ! -d ".git" ]; then
+  echo ">>> Initializing local git repo for flake"
+  git init -b main
+  git add flake.nix pyproject.toml uv.lock requirements.bak.txt
+  git commit -m "init local flake"
+else
+  echo ">>> Git repo already exists in $TargetDir, skipping init"
+fi
 
 exit
 ## end of script
