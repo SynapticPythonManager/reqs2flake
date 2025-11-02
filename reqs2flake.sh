@@ -180,18 +180,36 @@ EOF
 
 gen_toml
 
-# --- Git bootstrap for local flake ---
+bakhash=$(sha256sum $TargetDir/requirements.bak.txt | awk '{print $1}')
+bakhash=${bakhash: -8}
+echo "$bakhash"
+
+
+handle_git() {
 cd "$TargetDir"
 
-# Only init if not already a git repo
+FILES="flake.nix pyproject.toml uv.lock requirements.bak.txt"
+
 if [ ! -d ".git" ]; then
   echo ">>> Initializing local git repo for flake"
   git init -b main
-  git add flake.nix pyproject.toml uv.lock requirements.bak.txt
-  git commit -m "init local flake"
+  git add $FILES
+  git commit -m "init local flake - reqs2flake.sh preparing $bakhash for development"
 else
-  echo ">>> Git repo already exists in $TargetDir, skipping init"
+  echo ">>> Git repo already exists in $TargetDir, checking for changes"
+  # Stage any new or modified files
+  git add $FILES
+
+  # Only commit if there are staged changes
+  if git diff --cached --quiet; then
+    echo ">>> No changes to commit"
+  else
+    git commit -m "update local flake - reqs2flake.sh refreshing $bakhash"
+  fi
 fi
+}
+
+handle_git
 
 exit
 ## end of script
@@ -203,6 +221,9 @@ nix develop --impure
 ### imports should work
 python somefile.py
 ################################################################################
+git clone reqs2flake && cd ./reqs2flake
+cd ~/sync/reqs2flake && ./reqs2flake.sh && cd ./numtest && nix develop --impure
+python3 -c "import numpy; print(numpy.__version__)"
 #occasionally try:
 rm -rf ~/.cache/uv
 rm -rf ~/.cache/pypoetry
