@@ -223,7 +223,9 @@ python somefile.py
 ################################################################################
 git clone reqs2flake && cd ./reqs2flake
 cd ~/sync/reqs2flake && ./reqs2flake.sh && cd ./numtest && nix develop --impure
-python3 -c "import numpy; print(numpy.__version__)"
+
+cd ~/sync/reqs2flake && ./versions.sh
+# python3 -c "import numpy; print(numpy.__version__)"
 #occasionally try:
 rm -rf ~/.cache/uv
 rm -rf ~/.cache/pypoetry
