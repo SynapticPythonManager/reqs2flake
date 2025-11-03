@@ -180,7 +180,7 @@ EOF
 
 gen_toml
 
-bakhash=$(sha256sum $TargetDir/requirements.bak.txt | awk '{print $1}')
+bakhash=$(sha256sum $TargetDir/requirements.txt | awk '{print $1}')
 bakhash=${bakhash: -8}
 echo "$bakhash"
 
